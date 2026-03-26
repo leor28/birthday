@@ -144,29 +144,6 @@ input[type="date"], input[type="text"] {
   text-align: center;
 }
 
-#feedback {
-  display: none;
-  margin-top: 15px;
-}
-
-#feedback p {
-  margin-bottom: 10px;
-}
-
-.kiss {
-  position: fixed;
-  top: -50px;
-  font-size: 40px;
-  z-index: 1000;
-  pointer-events: none;
-  animation: fallKiss linear forwards;
-}
-
-@keyframes fallKiss {
-  0% { transform: translateY(0) rotate(0deg); opacity:1; }
-  100% { transform: translateY(100vh) rotate(360deg); opacity:1; }
-}
-
 #overlay {
   display: none;
   position: fixed;
@@ -200,7 +177,7 @@ input[type="date"], input[type="text"] {
     <button onclick="submitWish()">Submit Wish</button>
   </div>
 
-  <!-- Cake section -->
+  <!-- Cake -->
   <div class="cake-area" id="cake">
     <div class="cake">
       <div class="icing"></div>
@@ -210,32 +187,23 @@ input[type="date"], input[type="text"] {
     </div>
   </div>
 
-  <!-- Blow candle button -->
   <button onclick="blowCandle()" id="blowBtn" style="display:none;">Blow Out Candle 🎂</button>
 
-  <!-- Image to show after candle -->
+  <!-- Image -->
   <img id="surpriseImage" src="birthday draw.jpg">
 
-  <!-- Text below image -->
+  <!-- Text -->
   <p id="message">
 Since you were born in a sweet spring, and it’s the season of your flowers, I wanted to give you this drawing that represents your birthday. Wishing you happiness every year.
 </p>
-
-  <!-- Feedback section -->
-  <div id="feedback">
-    <p id="feedbackText">Did you like the surprise?</p>
-    <button id="yesBtn" onclick="feedbackYes()">Yes</button>
-    <button id="noBtn" onclick="feedbackNo()">No</button>
-  </div>
 </div>
 
-<!-- Overlay for dramatic effect -->
 <div id="overlay"></div>
 
 <script>
 const flame = document.getElementById("flame");
 let blown = false;
-const correctDate = "2026-01-20"; // ضع التاريخ الصحيح هنا
+const correctDate = "2026-01-20";
 
 function blowCandle() {
   flame.classList.add("off");
@@ -252,11 +220,9 @@ function blowCandle() {
     overlay.style.display = "none";
     document.getElementById("surpriseImage").style.display = "block";
     document.getElementById("message").style.display = "block";
-    document.getElementById("feedback").style.display = "block";
   }, 1000);
 }
 
-// كشف التاريخ
 function checkDate() {
   const userDate = document.getElementById("dateInput").value;
   if (userDate === correctDate) {
@@ -267,7 +233,6 @@ function checkDate() {
   }
 }
 
-// بعد كتابة الأمنية
 function submitWish() {
   const wish = document.getElementById("wishInput").value;
   if(wish.trim() === "") {
@@ -279,12 +244,9 @@ function submitWish() {
   document.getElementById("blowBtn").style.display = "inline-block";
 
   startConfetti();
-
-  // الآن نبدأ تشغيل المايك
   startMic();
 }
 
-// ميكروفون للكشف عن النفخ
 async function startMic() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -310,50 +272,16 @@ async function startMic() {
   }
 }
 
-// Confetti
 function startConfetti() {
-  const colors = ["#ff0a54","#ff477e","#ff7096","#ff85a1","#fbb1b1","#f9bec7","#f7cad0","#fae0e4"];
+  const colors = ["#ff0a54","#ff477e","#ff7096","#ff85a1","#fbb1b1"];
   for(let i=0;i<100;i++){
     const confetti = document.createElement("div");
     confetti.classList.add("confetti");
     confetti.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
     confetti.style.left = Math.random()*100 + "vw";
     confetti.style.animationDuration = (3 + Math.random()*5) + "s";
-    confetti.style.width = 5 + Math.random()*8 + "px";
-    confetti.style.height = 5 + Math.random()*8 + "px";
     document.body.appendChild(confetti);
   }
-}
-
-// الأمطار من البوسة
-function showKissRain() {
-  const colors = ["#ff4da6","pink","#ff1a75","#ff66b3","#ff99cc"];
-  for(let i=0;i<30;i++){ // عدد البوسات في كل "أمطار"
-    const kiss = document.createElement("div");
-    kiss.classList.add("kiss");
-    kiss.textContent = "😘";
-    kiss.style.left = Math.random() * 100 + "vw";
-    kiss.style.fontSize = 30 + Math.random()*30 + "px";
-    kiss.style.animationDuration = 2 + Math.random()*2 + "s";
-    kiss.style.color = colors[Math.floor(Math.random()*colors.length)];
-    document.body.appendChild(kiss);
-    kiss.addEventListener("animationend", ()=> kiss.remove());
-  }
-}
-
-// Feedback functions
-function feedbackYes() {
-  document.getElementById("feedbackText").style.display = "none";
-  document.getElementById("yesBtn").style.display = "none";
-  document.getElementById("noBtn").style.display = "none";
-  showKissRain();
-}
-
-function feedbackNo() {
-  const noBtn = document.getElementById("noBtn");
-  noBtn.textContent = "Yes";
-  noBtn.onclick = feedbackYes;
-  showKissRain();
 }
 </script>
 
