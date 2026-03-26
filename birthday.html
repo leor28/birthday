@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Card</title>
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #dff4ff, #8fd3ff);
+  font-family: sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+
+.card {
+  background: rgba(255,255,255,0.4);
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  z-index: 2;
+  position: relative;
+}
+
+#title {
+  margin-bottom: 15px;
+}
+
+.cake-area {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: auto;
+  display: none;
+}
+
+.cake {
+  position: absolute;
+  bottom: 30px;
+  width: 120px;
+  height: 60px;
+  background: #4fa9e8;
+  border-radius: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.icing {
+  position: absolute;
+  top: -15px;
+  width: 130px;
+  height: 25px;
+  background: white;
+  border-radius: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.candle {
+  position: absolute;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 15px;
+  height: 40px;
+  background: white;
+  border-radius: 5px;
+}
+
+.flame {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 15px;
+  height: 20px;
+  background: orange;
+  border-radius: 50%;
+  animation: flicker 0.2s infinite alternate;
+}
+
+.flame.off {
+  display: none;
+}
+
+@keyframes flicker {
+  from { transform: translateX(-50%) scale(1); }
+  to { transform: translateX(-50%) scale(1.1); }
+}
+
+button {
+  margin-top: 15px;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 10px;
+  background: #0b5fa5;
+  color: white;
+  cursor: pointer;
+}
+
+input[type="date"], input[type="text"] {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  opacity: 0.9;
+  top: -10px;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 1;
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(110vh) rotate(360deg);
+  }
+}
+
+#surpriseImage {
+  display: none;
+  width: 250px;
+  border-radius: 15px;
+  margin: 20px auto 0 auto;
+}
+
+#message {
+  display: none;
+  margin: 15px auto 0 auto;
+  font-size: 16px;
+  color: #0b5fa5;
+  max-width: 300px;
+  text-align: center;
+}
+
+#feedback {
+  display: none;
+  margin-top: 15px;
+}
+
+#feedback p {
+  margin-bottom: 10px;
+}
+
+.kiss {
+  position: fixed;
+  top: -50px;
+  font-size: 40px;
+  z-index: 1000;
+  pointer-events: none;
+  animation: fallKiss linear forwards;
+}
+
+@keyframes fallKiss {
+  0% { transform: translateY(0) rotate(0deg); opacity:1; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity:1; }
+}
+
+#overlay {
+  display: none;
+  position: fixed;
+  top:0; left:0;
+  width:100vw;
+  height:100vh;
+  background: rgba(0,0,0,0.6);
+  z-index: 5;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2 id="title">🎉 Happy Birthday 🎉</h2>
+
+  <!-- Date input -->
+  <div id="dateSection">
+    <p>Enter the date we met 💙</p>
+    <input type="date" id="dateInput">
+    <br>
+    <button onclick="checkDate()">Continue</button>
+  </div>
+
+  <!-- Wish input -->
+  <div id="wishSection" style="display:none;">
+    <p>Make your wish ✨</p>
+    <input type="text" id="wishInput" placeholder="Type your wish here">
+    <br>
+    <button onclick="submitWish()">Submit Wish</button>
+  </div>
+
+  <!-- Cake section -->
+  <div class="cake-area" id="cake">
+    <div class="cake">
+      <div class="icing"></div>
+    </div>
+    <div class="candle">
+      <div class="flame" id="flame"></div>
+    </div>
+  </div>
+
+  <!-- Blow candle button -->
+  <button onclick="blowCandle()" id="blowBtn" style="display:none;">Blow Out Candle 🎂</button>
+
+  <!-- Image to show after candle -->
+  <img id="surpriseImage" src="birthday draw.jpg">
+
+  <!-- Text below image -->
+  <p id="message">
+Since you were born in a sweet spring, and it’s the season of your flowers, I wanted to give you this drawing that represents your birthday. Wishing you happiness every year.
+</p>
+
+  <!-- Feedback section -->
+  <div id="feedback">
+    <p id="feedbackText">Did you like the surprise?</p>
+    <button id="yesBtn" onclick="feedbackYes()">Yes</button>
+    <button id="noBtn" onclick="feedbackNo()">No</button>
+  </div>
+</div>
+
+<!-- Overlay for dramatic effect -->
+<div id="overlay"></div>
+
+<script>
+const flame = document.getElementById("flame");
+let blown = false;
+const correctDate = "2026-01-20"; // ضع التاريخ الصحيح هنا
+
+function blowCandle() {
+  flame.classList.add("off");
+  blown = true;
+
+  document.getElementById("cake").style.display = "none";
+  document.getElementById("blowBtn").style.display = "none";
+  document.getElementById("title").style.display = "none";
+
+  const overlay = document.getElementById("overlay");
+  overlay.style.display = "block";
+
+  setTimeout(() => {
+    overlay.style.display = "none";
+    document.getElementById("surpriseImage").style.display = "block";
+    document.getElementById("message").style.display = "block";
+    document.getElementById("feedback").style.display = "block";
+  }, 1000);
+}
+
+// كشف التاريخ
+function checkDate() {
+  const userDate = document.getElementById("dateInput").value;
+  if (userDate === correctDate) {
+    document.getElementById("dateSection").style.display = "none";
+    document.getElementById("wishSection").style.display = "block";
+  } else {
+    alert("Wrong date 😢 Try again!");
+  }
+}
+
+// بعد كتابة الأمنية
+function submitWish() {
+  const wish = document.getElementById("wishInput").value;
+  if(wish.trim() === "") {
+    alert("Please write your wish before continuing!");
+    return;
+  }
+  document.getElementById("wishSection").style.display = "none";
+  document.getElementById("cake").style.display = "block";
+  document.getElementById("blowBtn").style.display = "inline-block";
+
+  startConfetti();
+}
+
+// ميكروفون للكشف عن النفخ
+async function startMic() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const audioContext = new AudioContext();
+    const mic = audioContext.createMediaStreamSource(stream);
+    const analyser = audioContext.createAnalyser();
+
+    mic.connect(analyser);
+    analyser.fftSize = 128;
+
+    const data = new Uint8Array(analyser.frequencyBinCount);
+
+    function detectBlow() {
+      if (blown) return;
+      analyser.getByteFrequencyData(data);
+      let volume = data.reduce((a,b)=>a+b)/data.length;
+      if (volume > 45) blowCandle();
+      requestAnimationFrame(detectBlow);
+    }
+    detectBlow();
+  } catch(err) {
+    console.log("Mic not allowed");
+  }
+}
+
+startMic();
+
+// Confetti
+function startConfetti() {
+  const colors = ["#ff0a54","#ff477e","#ff7096","#ff85a1","#fbb1b1","#f9bec7","#f7cad0","#fae0e4"];
+  for(let i=0;i<100;i++){
+    const confetti = document.createElement("div");
+    confetti.classList.add("confetti");
+    confetti.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+    confetti.style.left = Math.random()*100 + "vw";
+    confetti.style.animationDuration = (3 + Math.random()*5) + "s";
+    confetti.style.width = 5 + Math.random()*8 + "px";
+    confetti.style.height = 5 + Math.random()*8 + "px";
+    document.body.appendChild(confetti);
+  }
+}
+
+// الأمطار من البوسة
+function showKissRain() {
+  const colors = ["#ff4da6","pink","#ff1a75","#ff66b3","#ff99cc"];
+  for(let i=0;i<30;i++){ // عدد البوسات في كل "أمطار"
+    const kiss = document.createElement("div");
+    kiss.classList.add("kiss");
+    kiss.textContent = "😘";
+    kiss.style.left = Math.random() * 100 + "vw";
+    kiss.style.fontSize = 30 + Math.random()*30 + "px";
+    kiss.style.animationDuration = 2 + Math.random()*2 + "s";
+    kiss.style.color = colors[Math.floor(Math.random()*colors.length)];
+    document.body.appendChild(kiss);
+    kiss.addEventListener("animationend", ()=> kiss.remove());
+  }
+}
+
+// Feedback functions
+function feedbackYes() {
+  document.getElementById("feedbackText").style.display = "none";
+  document.getElementById("yesBtn").style.display = "none";
+  document.getElementById("noBtn").style.display = "none";
+  showKissRain();
+}
+
+function feedbackNo() {
+  const noBtn = document.getElementById("noBtn");
+  noBtn.textContent = "Yes";
+  noBtn.onclick = feedbackYes;
+  showKissRain();
+}
+</script>
+
+</body>
+</html>
