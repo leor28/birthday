@@ -214,7 +214,7 @@ input[type="date"], input[type="text"] {
   <button onclick="blowCandle()" id="blowBtn" style="display:none;">Blow Out Candle 🎂</button>
 
   <!-- Image to show after candle -->
-  <img id="surpriseImage" src="birthday draw.jpg">
+  <img id="surpriseImage" src="your-drawing.png">
 
   <!-- Text below image -->
   <p id="message">
@@ -279,6 +279,9 @@ function submitWish() {
   document.getElementById("blowBtn").style.display = "inline-block";
 
   startConfetti();
+
+  // الآن نبدأ تشغيل المايك
+  startMic();
 }
 
 // ميكروفون للكشف عن النفخ
@@ -306,8 +309,6 @@ async function startMic() {
     console.log("Mic not allowed");
   }
 }
-
-startMic();
 
 // Confetti
 function startConfetti() {
